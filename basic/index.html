@@ -19,8 +19,7 @@
             var geometry = new THREE.CubeGeometry(2,2,2); 
             var geometry2 = new THREE.SphereGeometry ( 2,1,1); 
             var material = new THREE.MeshNormalMaterial({color: 0x347896}); 
-            var material2 = new THREE.MeshDepthMaterial({color: 0x560000}); 
-            
+            var material2 = new THREE.MeshDepthMaterial({color: 0x560000});             
 				var materialSpheres = new THREE.MeshLambertMaterial( { color: 0x564390, shading: THREE.FlatShading, overdraw: false } );
             var cube = new THREE.Mesh(geometry, material);
             var cube2 =new THREE.Mesh(geometry2, materialSpheres);
