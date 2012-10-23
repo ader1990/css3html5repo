@@ -1,115 +1,202 @@
 <html>
     <head>
+        <style>
+            *{
+                margin:0;
+            }
+        </style>
         <title>My first Three.js app</title>
         <style>canvas { width: 100%; height: 100% ;background-color: #000;}</style>
     </head>
     <body>
+        <div id="freeze" style="cursor:pointer;width: 100px;background-color: #ff0000;height: 20px;position:fixed;margin-top:0px;">Freeze</div>
+        <input id="freezeNr" style="width: 100px;background-color: #00ff00;height: 20px;position:fixed;margin-top:20px;" type="text"/>
+
+        <div style="width: 300px;background-color: #666;height: 100px;position:fixed;margin-top:10px;margin-left:500px;">
+            <div id="top" style="margin:10px;width:20px;height:20px;cursor:pointer;float:left;position: relative;">top</div>
+            <div id="left" style="margin:10px;width:20px;height:20px;float:left;position: relative;cursor:pointer">left</div>
+            <div id="right" style="margin:10px;width:20px;height:20px;float:left;position: relative;cursor:pointer">right</div>
+            <div id="bottom" style="margin:10px;width:30px;height:20px;float:left;position: relative;cursor:pointer">bottom</div>
+            <div id="in" style="margin:10px;width:20px;height:20px;float:left;position: relative;cursor:pointer">in</div>
+            <div id="out" style="margin:10px;width:20px;height:20px;float:left;position: relative;cursor:pointer">out</div>
+        </div>
+
+        <script src="../libs/jquery/jquery.js"></script>  
+        <script src="../libs/jquery/jquery-ui.js"></script>  
         <script src="../three.js/three.js"></script>
+
+
         <script> // Our Javascript will go here.
             
+            $(document).ready(function(){
+              
             
             
-            //UGLY STUFF
-            var scene = new THREE.Scene();            
-            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); 
-            var width=window.innerWidth;
-            var height=window.innerHeight;
-            var renderer = new THREE.WebGLRenderer();            
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
+                //UGLY STUFF
+                var freeze=false;
+                var scene = new THREE.Scene();            
+                var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); 
+                var width=window.innerWidth;
+                var height=window.innerHeight;
+                var renderer = new THREE.WebGLRenderer();            
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
             
             
-            //GEOMETRIES
-            var geometry = new THREE.CubeGeometry(0.3,0.3,0.3); 
-            var geometry2 = new THREE.SphereGeometry ( 0.2,0.2,0.2); 
+                //GEOMETRIES
+                var geometry = new THREE.CubeGeometry(0.3,0.3,0.3); 
+                var geometry2 = new THREE.SphereGeometry ( 0.2,0.2,0.2); 
             
-            //MATERIALS
-            var material = new THREE.MeshNormalMaterial({color: 0x347896}); 
-            var material2 = new THREE.MeshDepthMaterial({color: 0x560000});             
-            var materialSpheres = new THREE.MeshLambertMaterial( { color: 0x564390, shading: THREE.FlatShading, overdraw: false } );
+                //MATERIALS
+                var material = new THREE.MeshNormalMaterial({color: 0x347896}); 
+                var material2 = new THREE.MeshDepthMaterial({color: 0x560000});             
+                var materialSpheres = new THREE.MeshLambertMaterial( { color: 0x564390, shading: THREE.FlatShading, overdraw: false } );
             
            
-            var objects=[];
-            var numberOfObjects=30;
-            var getRandom=function(){
-                var sign=parseInt(Math.random()*100)%2;
-                if(sign==0)
-                    sign=parseInt(Math.random()*100)%4;
-                else
-                    sign=-parseInt(Math.random()*100)%4;
-                var rand=Math.random()/100*sign;
-                //console.log(rand);
-                return rand*2;
-            }
-            var MovableObject=function(object){
-                var self=this;
-                self.object=object;  
-                
-                self.resetRandom=function(){
-                    
-                self.positionX=getRandom();  
-                self.positionY=getRandom();  
-                self.positionZ=getRandom();    
+                //objects
+                var objects=[];
+                var numberOfObjects=3;
+                var getRandom=function(){
+                    var sign=parseInt(Math.random()*100)%2;
+                    if(sign==0)
+                        sign=parseInt(Math.random()*100)%4;
+                    else
+                        sign=-parseInt(Math.random()*100)%4;
+                    var rand=Math.random()/100*sign;
+                    //console.log(rand);
+                    return rand*2;
                 }
                 
-                 self.resetRandom();
-            }
-            for(var j=0;j<numberOfObjects;j++){
-                var object=new THREE.Mesh(geometry, material);     
+                var MovableObject=function(object){
+                    var self=this;
+                    self.object=object;  
+                    self.freeze=false;
+                    self.resetRandom=function(){                    
+                        self.positionX=getRandom();  
+                        self.positionY=getRandom();  
+                        self.positionZ=getRandom();    
+                    }
+                
+                    self.resetRandom();
+                }
+                
+                //MASTER OBJECT
+                
+                var geometry3 = new THREE.SphereGeometry ( 0.4,0.2,0.2); 
+                var object=new THREE.Mesh(geometry3, material);     
                 scene.add(object);
                 objects.push(new MovableObject(object));
-                var object=new THREE.Mesh(geometry2, material);     
-                scene.add(object);
-                objects.push(new MovableObject(object));
-            }
+                
+                
+                
+                //
+                for(var j=1;j<numberOfObjects;j++){
+                    var object=new THREE.Mesh(geometry, material);     
+                    scene.add(object);
+                    objects.push(new MovableObject(object));
+                    var object=new THREE.Mesh(geometry2, material);     
+                    scene.add(object);
+                    objects.push(new MovableObject(object));
+                }
             
-            camera.position.z = 5;
-            var i=0;
-            var rand1=0;
-            var rand2=0;
-            var rand3=0;
+                camera.position.z = 5;
+                var i=0;
+                var rand1=0;
+                var rand2=0;
+                var rand3=0;
             
        
             
-            rand1=getRandom();
-            rand2=getRandom();
-            rand3=getRandom();
-            var max=8;
-            function render() { 
-                console.log("render");
-                requestAnimationFrame(render);  
-                
-                for(var i in objects ){                          
-                        objects[i].object.position.x+= objects[i].positionX;
-                  if(objects[i].object.position.x>max||objects[i].object.position.x<-max){
-                      objects[i].resetRandom();
-                        objects[i].object.position.x=objects[i].positionX*3;
-                    }
-                    
-                    objects[i].object.position.y+= objects[i].positionY;                    
-                    if(objects[i].object.position.y>max||objects[i].object.position.y<-max){  objects[i].resetRandom();
-                        objects[i].object.position.y=objects[i].positionY*3;
-                    }
-                    
-                    objects[i].object.position.z+=objects[i].positionZ;                    
-                    if(objects[i].object.position.z>max||objects[i].object.position.z<-max){  objects[i].resetRandom();
-                        objects[i].object.position.z=objects[i].positionZ*3;
-                    }
-                    
-                    objects[i].object.rotation.x+=objects[i].positionX;
-                    objects[i].object.rotation.y+=objects[i].positionY;
-                    objects[i].object.rotation.z+=objects[i].positionZ;
-                }
-                i++;
-                if(++i%60==0){
-                    i=0;                
-                    //material.setRGB(rand1,rand2,rand3);
-                    //material2.setRGB(rand1,rand2,rand3);
-                }
-                renderer.render(scene, camera); 
-            } 
+                rand1=getRandom();
+                rand2=getRandom();
+                rand3=getRandom();
+                var max=8;
             
-            render();
+                //binders 
+                $("#freeze").live(
+                "click",function(){
+                    var value=$("#freezeNr").val();
+                    if(value){                        
+                        try{
+                            value=parseInt(value);
+                            if(value>=0 &&value<numberOfObjects){
+                                objects[value].object.freeze=!objects[value].object.freeze;
+                            }
+                        }catch(e){
+                            
+                        };
+                    }
+                    else{
+                        freeze=!freeze;
+                    }
+                    
+                });    
+                
+                $("#top").live(
+                "click",function(){
+                    objects[0].object.position.x+=0.22;
+                    
+                });
+                
+                $("body").keydown(function(e) {
+                     console.log(e);
+                     var offset=0.21;
+                    var key = e.which;
+                    if(key==37){
+                        objects[0].object.positionX-=offset;
+                    }
+                    if(key==39){
+                        objects[0].object.position.x+=offset;
+                    }
+                    if(key==38){
+                        objects[0].object.position.y+=offset;
+                    }
+                    if(key==40){
+                        objects[0].object.position.y-=offset;
+                    }
+                });
+               
+       
+            
+                //EXECUTES 60 TIMES A SECOND
+                function render() { 
+                    requestAnimationFrame(render);  
+                    if(!freeze){
+                        for(var i in objects ){                          
+                            if(!objects[i].object.freeze){
+                                objects[i].object.position.x+= objects[i].positionX;
+                                if(objects[i].object.position.x>max||objects[i].object.position.x<-max){
+                                    objects[i].resetRandom();
+                                    objects[i].object.position.x=objects[i].positionX*3;
+                                }
+                    
+                                objects[i].object.position.y+= objects[i].positionY;                    
+                                if(objects[i].object.position.y>max||objects[i].object.position.y<-max){  objects[i].resetRandom();
+                                    objects[i].object.position.y=objects[i].positionY*3;
+                                }
+                    
+                                objects[i].object.position.z+=objects[i].positionZ;                    
+                                if(objects[i].object.position.z>max||objects[i].object.position.z<-max){  objects[i].resetRandom();
+                                    objects[i].object.position.z=objects[i].positionZ*3;
+                                }
+                    
+                                objects[i].object.rotation.x+=objects[i].positionX;
+                                objects[i].object.rotation.y+=objects[i].positionY;
+                                objects[i].object.rotation.z+=objects[i].positionZ;
+                            }
+                        }
+                        i++;
+                        if(++i%60==0){
+                            i=0;                
+                            //material.setRGB(rand1,rand2,rand3);
+                            //material2.setRGB(rand1,rand2,rand3);
+                        }
+                        renderer.render(scene, camera); 
+                    }
+                } 
+            
+                render();
+            });
         </script> 
     </body> 
 </html>
