@@ -78,11 +78,22 @@
                     }
                 
                     self.resetRandom();
+					
+					self.checkColision=function(otherObject){
+					if(self==otherObject)
+					return false;
+					  if (
+					  (self.object.position.x-otherObject.object.position.x)*(self.object.position.x-otherObject.object.position.x)<0.1 &&
+					  (self.object.position.z-otherObject.object.position.z)*(self.object.position.z-otherObject.object.position.z)<0.1 &&
+					  (self.object.position.y-otherObject.object.position.y)*(self.object.position.y-otherObject.object.position.y)<0.1 
+					  )
+					  console.log("Colision");
+					}
                 }
                 
                 //MASTER OBJECT
                 
-                var geometry3 = new THREE.SphereGeometry ( 0.4,0.2,0.2); 
+                var geometry3 = new THREE.SphereGeometry ( 0.1,0.1,0.1); 
                 var object=new THREE.Mesh(geometry3, material);     
                 scene.add(object);
                 objects.push(new MovableObject(object));
@@ -139,7 +150,6 @@
                 });
                 
                 $("body").keydown(function(e) {
-                    console.log(e);
                     var offset=0.002;
                     var key = e.which;
                     if(key==37){
@@ -164,7 +174,9 @@
                     if(!freeze){
                         for(var i in objects ){                          
                             if(!objects[i].object.freeze){
-                                
+                                for(var k in objects){
+								objects[i].checkColision(objects[k]);
+								}
                                 objects[i].object.position.x+= objects[i].positionX;
                                 if(objects[i].object.position.x>max||objects[i].object.position.x<-max){
                                     objects[i].resetRandom();
