@@ -29,9 +29,12 @@
         <script> // Our Javascript will go here.
             
             $(document).ready(function(){
-              
-            
-            
+                var lambdaColision=0.05;   
+                var colisionActive=false;
+                setTimeout(
+                function(){
+                    colisionActive=true;
+                },3000);
                 //UGLY STUFF
                 var freeze=false;
                 var scene = new THREE.Scene();            
@@ -55,7 +58,7 @@
            
                 //objects
                 var objects=[];
-                var numberOfObjects=3;
+                var numberOfObjects=15;
                 var getRandom=function(){
                     var sign=parseInt(Math.random()*100)%2;
                     if(sign==0)
@@ -64,152 +67,167 @@
                         sign=-parseInt(Math.random()*100)%4;
                     var rand=Math.random()/100*sign;
                     //console.log(rand);
-                    return rand*2;
+                    return rand*2+0.0001;
                 }
                 
-                var MovableObject=function(object){
-                    var self=this;
-                    self.object=object;  
-                    self.freeze=false;
-                    self.resetRandom=function(){                    
-                        self.positionX=getRandom();  
-                        self.positionY=getRandom();  
-                        self.positionZ=getRandom();    
-                    }
+            var MovableObject=function(object){
+                var self=this;
+                self.object=object;  
+                self.freeze=false;
+                self.resetRandom=function(){                    
+                    self.positionX=getRandom();  
+                    self.positionY=getRandom();  
+                    self.positionZ=getRandom();    
+                }
                 
-                    self.resetRandom();
+                self.resetRandom();
 					
-					self.checkColision=function(otherObject){
-					if(self==otherObject)
-					return false;
-					  if (
-					  (self.object.position.x-otherObject.object.position.x)*(self.object.position.x-otherObject.object.position.x)<0.1 &&
-					  (self.object.position.z-otherObject.object.position.z)*(self.object.position.z-otherObject.object.position.z)<0.1 &&
-					  (self.object.position.y-otherObject.object.position.y)*(self.object.position.y-otherObject.object.position.y)<0.1 
-					  )
-					  console.log("Colision");
-					}
+                self.checkColision=function(otherObject){
+                        
+                         
+                    if (
+                    (self.object.position.x-otherObject.object.position.x)*(self.object.position.x-otherObject.object.position.x)<lambdaColision &&
+                        (self.object.position.z-otherObject.object.position.z)*(self.object.position.z-otherObject.object.position.z)<lambdaColision &&
+                        (self.object.position.y-otherObject.object.position.y)*(self.object.position.y-otherObject.object.position.y)<lambdaColision 
+                )
+                    {
+                        //console.log("Colision");
+                        var intermX = self.positionX;  
+                        var intermY = self.positionY;  
+                        var intermZ = self.positionZ;
+						
+                        self.positionX = otherObject.positionX;	
+                        self.positionY = otherObject.positionY;
+                        self.positionZ = otherObject.positionZ;
+						
+                        otherObject.positionX = intermX;	
+                        otherObject.positionY = intermY;
+                        otherObject.positionZ = intermZ;
+					  
+                    }
                 }
+            }
                 
-                //MASTER OBJECT
+            //MASTER OBJECT
                 
-                var geometry3 = new THREE.SphereGeometry ( 0.1,0.1,0.1); 
-                var object=new THREE.Mesh(geometry3, material);     
+            var geometry3 = new THREE.SphereGeometry ( 0.1,0.1,0.1); 
+            var object=new THREE.Mesh(geometry3, material);     
+            scene.add(object);
+            objects.push(new MovableObject(object));
+                
+                
+                
+            //
+            for(var j=1;j<numberOfObjects;j++){
+                var object=new THREE.Mesh(geometry, material);     
                 scene.add(object);
                 objects.push(new MovableObject(object));
-                
-                
-                
-                //
-                for(var j=1;j<numberOfObjects;j++){
-                    var object=new THREE.Mesh(geometry, material);     
-                    scene.add(object);
-                    objects.push(new MovableObject(object));
-                    var object=new THREE.Mesh(geometry2, material);     
-                    scene.add(object);
-                    objects.push(new MovableObject(object));
-                }
+                var object=new THREE.Mesh(geometry2, material);     
+                scene.add(object);
+                objects.push(new MovableObject(object));
+            }
             
-                camera.position.z = 5;
-                var i=0;
-                var rand1=0;
-                var rand2=0;
-                var rand3=0;
+            camera.position.z = 5;
+            var i=0;
+            var rand1=0;
+            var rand2=0;
+            var rand3=0;
             
        
             
-                rand1=getRandom();
-                rand2=getRandom();
-                rand3=getRandom();
-                var max=8;
+            rand1=getRandom();
+            rand2=getRandom();
+            rand3=getRandom();
+            var max=8;
             
-                //binders 
-                $("#freeze").live(
-                "click",function(){
-                    var value=$("#freezeNr").val();
-                    if(value){                        
-                        try{
-                            value=parseInt(value);
-                            if(value>=0 &&value<numberOfObjects){
-                                objects[value].object.freeze=!objects[value].object.freeze;
-                            }
-                        }catch(e){
+            //binders 
+            $("#freeze").live(
+            "click",function(){
+                var value=$("#freezeNr").val();
+                if(value){                        
+                    try{
+                        value=parseInt(value);
+                        if(value>=0 &&value<numberOfObjects){
+                            objects[value].object.freeze=!objects[value].object.freeze;
+                        }
+                    }catch(e){
                             
-                        };
-                    }
-                    else{
-                        freeze=!freeze;
-                    }
+                    };
+                }
+                else{
+                    freeze=!freeze;
+                }
                     
-                });    
+            });    
                 
-                $("#top").live(
-                "click",function(){
-                    objects[0].object.position.x+=0.22;
+            $("#top").live(
+            "click",function(){
+                objects[0].object.position.x+=0.22;
                     
-                });
-                
-                $("body").keydown(function(e) {
-                    var offset=0.002;
-                    var key = e.which;
-                    if(key==37){
-                        objects[0].positionX-=offset;
-                    }
-                    if(key==39){
-                        objects[0].positionX+=offset;
-                    }
-                    if(key==38){
-                        objects[0].positionY+=offset;
-                    }
-                    if(key==40){
-                        objects[0].positionY-=offset;
-                    }
-                });
-               
-       
-            
-                //EXECUTES 60 TIMES A SECOND
-                function render() { 
-                    requestAnimationFrame(render);  
-                    if(!freeze){
-                        for(var i in objects ){                          
-                            if(!objects[i].object.freeze){
-                                for(var k in objects){
-								objects[i].checkColision(objects[k]);
-								}
-                                objects[i].object.position.x+= objects[i].positionX;
-                                if(objects[i].object.position.x>max||objects[i].object.position.x<-max){
-                                    objects[i].resetRandom();
-                                    objects[i].object.position.x=objects[i].positionX*3;
-                                }
-                    
-                                objects[i].object.position.y+= objects[i].positionY;                    
-                                if(objects[i].object.position.y>max||objects[i].object.position.y<-max){  objects[i].resetRandom();
-                                    objects[i].object.position.y=objects[i].positionY*3;
-                                }
-                    
-                                //objects[i].object.position.z+=objects[i].positionZ;                    
-                                if(objects[i].object.position.z>max||objects[i].object.position.z<-max){  objects[i].resetRandom();
-                                    objects[i].object.position.z=objects[i].positionZ*3;
-                                }
-                    
-                                objects[i].object.rotation.x+=objects[i].positionX;
-                                objects[i].object.rotation.y+=objects[i].positionY;
-                                objects[i].object.rotation.z+=objects[i].positionZ;
-                            }
-                        }
-                        i++;
-                        if(++i%60==0){
-                            i=0;                
-                            //material.setRGB(rand1,rand2,rand3);
-                            //material2.setRGB(rand1,rand2,rand3);
-                        }
-                        renderer.render(scene, camera); 
-                    }
-                } 
-            
-                render();
             });
+                
+            $("body").keydown(function(e) {
+                var offset=0.005;
+                var key = e.which;
+                if(key==37){
+                    objects[1].positionX-=offset;
+                }
+                if(key==39){
+                    objects[1].positionX+=offset;
+                }
+                if(key==38){
+                    objects[1].positionY+=offset;
+                }
+                if(key==40){
+                    objects[1].positionY-=offset;
+                }
+            });
+               
+            var i=0;var k=0;
+            
+            //EXECUTES 60 TIMES A SECOND
+            function render() { 
+                requestAnimationFrame(render);  
+                if(!freeze){
+                    for(i=0;i<objects.length;i++ ){                          
+                        if(!objects[i].object.freeze){
+                            if(colisionActive)
+                                for(k=i;k<objects.length;k++){
+                                    objects[i].checkColision(objects[k]);
+                                }
+                            objects[i].object.position.x+= objects[i].positionX;
+                            if(objects[i].object.position.x>max||objects[i].object.position.x<-max){
+                                objects[i].resetRandom();
+                                objects[i].object.position.x=objects[i].positionX*3;
+                            }
+                    
+                            objects[i].object.position.y+= objects[i].positionY;                    
+                            if(objects[i].object.position.y>max||objects[i].object.position.y<-max){  objects[i].resetRandom();
+                                objects[i].object.position.y=objects[i].positionY*3;
+                            }
+                    
+                            //objects[i].object.position.z+=objects[i].positionZ;                    
+                            if(objects[i].object.position.z>max||objects[i].object.position.z<-max){  objects[i].resetRandom();
+                                objects[i].object.position.z=objects[i].positionZ*3;
+                            }
+                    
+                            objects[i].object.rotation.x+=objects[i].positionX;
+                            objects[i].object.rotation.y+=objects[i].positionY;
+                            objects[i].object.rotation.z+=objects[i].positionZ;
+                        }
+                    }
+                    i++;
+                    if(++i%60==0){
+                        i=0;                
+                        //material.setRGB(rand1,rand2,rand3);
+                        //material2.setRGB(rand1,rand2,rand3);
+                    }
+                    renderer.render(scene, camera); 
+                }
+            } 
+            
+            render();
+        });
         </script> 
     </body> 
 </html>
