@@ -1,0 +1,90 @@
+<html>
+    <head>
+        <title>My first Three.js app</title>
+        <style>canvas { width: 100%; height: 100% }</style>
+    </head>
+    <body>
+        <script src="../three.js/three.js"></script>
+        <script> // Our Javascript will go here.
+            
+            
+            //UGLY STUFF
+            var scene = new THREE.Scene();            
+            var camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000); 
+            var width=window.innerWidth;
+            var height=window.innerHeight;
+            var renderer = new THREE.WebGLRenderer();            
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+            
+            
+            //GEOMETRIES
+            var geometry = new THREE.CubeGeometry(2,2,2); 
+            var geometry2 = new THREE.SphereGeometry ( 2,1,1); 
+            
+            //MATERIALS
+            var material = new THREE.MeshNormalMaterial({color: 0x347896}); 
+            var material2 = new THREE.MeshDepthMaterial({color: 0x560000});             
+            var materialSpheres = new THREE.MeshLambertMaterial( { color: 0x564390, shading: THREE.FlatShading, overdraw: false } );
+            
+           
+            var objects=[];
+            var numberOfObjects=10;
+            var getRandom=function(){
+                var sign=parseInt(Math.random()*100)%2;
+                if(sign==0)
+                    sign=parseInt(Math.random()*100)%8;
+                else
+                    sign=-parseInt(Math.random()*100)%8;
+                var rand=Math.random()/100*sign;
+                //console.log(rand);
+                return rand;
+            }
+            var MovableObject=function(object){
+                var self=this;
+                self.object=object;
+                self.position=getRandom();                
+            }
+            for(var j=0;j<numberOfObjects;j++){
+                var object=new THREE.Mesh(geometry, material);     
+                scene.add(object);
+                objects.push(new MovableObject(object));
+            }
+            
+            camera.position.z = 5;
+            var i=0;
+            var rand1=0;
+            var rand2=0;
+            var rand3=0;
+            
+       
+            
+            rand1=getRandom();
+            rand2=getRandom();
+            rand3=getRandom();
+            
+            function render() { 
+                console.log("render");
+                requestAnimationFrame(render);  
+                
+                for(var i in objects ){                          
+                    objects[i].object.position.x+= objects[i].position;
+                    objects[i].object.position.y+= objects[i].position;
+                    objects[i].object.position.z+=objects[i].position;
+                    objects[i].object.rotation.x+=objects[i].position;
+                    objects[i].object.rotation.y+=objects[i].position;
+                    objects[i].object.rotation.z+=objects[i].position;
+                }
+                i++;
+                if(++i%60==0){
+                    i=0;                
+                    //material.setRGB(rand1,rand2,rand3);
+                    //material2.setRGB(rand1,rand2,rand3);
+                }
+                renderer.render(scene, camera); 
+            } 
+            
+            render();
+        </script> 
+    </body> 
+</html>
