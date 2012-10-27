@@ -254,9 +254,9 @@ $(document).ready(function () {
 
 
     var max = {};
-    max.x = width / 165;
+    max.x = width / 110;
     max.z = aspectRatio / 2;
-    max.y = height / 165;
+    max.y = height / 110;
 
     $("body").keydown(function (e) {
         var offset = 0.005;
